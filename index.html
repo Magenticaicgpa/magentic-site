@@ -1,0 +1,912 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Magentic | FlowLens – AI-Powered Debugging on Google Cloud</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta
+    name="description"
+    content="FlowLens by Magentic is an AI-powered debugging context platform built on Google Cloud. Capture full browser context for MCP-compatible AI coding agents and debug 10x faster."
+  />
+  <style>
+    :root {
+      --bg: #f5f5f9;
+      --bg-card: #ffffff;
+      --border-subtle: #e2e4ea;
+      --accent: #4b6bff;
+      --accent-soft: rgba(75, 107, 255, 0.08);
+      --accent-strong: #2b46c7;
+      --text-main: #12131a;
+      --text-muted: #5c6173;
+      --danger: #ff5b5b;
+      --radius-lg: 18px;
+      --radius-md: 12px;
+      --shadow-soft: 0 14px 40px rgba(12, 21, 64, 0.10);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        sans-serif;
+      background: radial-gradient(circle at top left, #ffffff 0, #f5f5f9 45%, #eceffd 100%);
+      color: var(--text-main);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .page {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      border-bottom: 1px solid rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(18px);
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      background: rgba(245, 245, 249, 0.85);
+    }
+
+    .nav {
+      max-width: 1160px;
+      margin: 0 auto;
+      padding: 0.85rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      font-size: 0.9rem;
+    }
+
+    .logo-mark {
+      width: 26px;
+      height: 26px;
+      border-radius: 999px;
+      background: conic-gradient(from 160deg, #4b6bff, #7f5dff, #14c8ff, #4b6bff);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+      font-size: 0.9rem;
+      box-shadow: 0 10px 30px rgba(75, 107, 255, 0.5);
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 1.25rem;
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+
+    .nav-links a {
+      position: relative;
+      padding-bottom: 2px;
+    }
+
+    .nav-links a::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      bottom: -3px;
+      width: 0;
+      height: 2px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, var(--accent), var(--accent-strong));
+      transition: width 0.22s ease-out;
+    }
+
+    .nav-links a:hover::after {
+      width: 100%;
+    }
+
+    .nav-cta {
+      padding: 0.45rem 0.9rem;
+      border-radius: 999px;
+      border: 1px solid rgba(75, 107, 255, 0.25);
+      background: linear-gradient(120deg, rgba(75, 107, 255, 0.14), rgba(255, 255, 255, 0.8));
+      font-size: 0.85rem;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+      cursor: pointer;
+      box-shadow: 0 8px 20px rgba(75, 107, 255, 0.18);
+    }
+
+    .nav-cta span {
+      font-size: 1rem;
+    }
+
+    main {
+      flex: 1;
+    }
+
+    .section {
+      max-width: 1160px;
+      margin: 0 auto;
+      padding: 2.75rem 1.5rem 3.25rem;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 3fr) minmax(0, 2.6fr);
+      gap: 2.5rem;
+      align-items: center;
+    }
+
+    .hero-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      padding: 0.25rem 0.7rem;
+      border-radius: 999px;
+      background: rgba(75, 107, 255, 0.08);
+      color: var(--accent-strong);
+      font-size: 0.8rem;
+      font-weight: 500;
+      margin-bottom: 1.1rem;
+    }
+
+    .hero-label-dot {
+      width: 7px;
+      height: 7px;
+      background: #38d488;
+      border-radius: 999px;
+      box-shadow: 0 0 0 6px rgba(56, 212, 136, 0.18);
+    }
+
+    .hero-title {
+      font-size: clamp(2.1rem, 3.1vw + 1rem, 3rem);
+      letter-spacing: -0.03em;
+      line-height: 1.1;
+      margin-bottom: 1rem;
+    }
+
+    .hero-title span {
+      background: linear-gradient(120deg, #4b6bff, #7f5dff);
+      -webkit-background-clip: text;
+      color: transparent;
+    }
+
+    .hero-subtitle {
+      color: var(--text-muted);
+      font-size: 0.98rem;
+      max-width: 36rem;
+      margin-bottom: 1.6rem;
+    }
+
+    .hero-badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+      margin-bottom: 1.6rem;
+    }
+
+    .badge {
+      font-size: 0.78rem;
+      padding: 0.25rem 0.65rem;
+      border-radius: 999px;
+      border: 1px solid rgba(180, 185, 209, 0.8);
+      background: rgba(255, 255, 255, 0.95);
+      color: #3d4254;
+    }
+
+    .hero-cta-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.8rem;
+      align-items: center;
+      margin-bottom: 1.3rem;
+    }
+
+    .btn-primary {
+      padding: 0.65rem 1.35rem;
+      border-radius: 999px;
+      border: none;
+      background: linear-gradient(130deg, var(--accent), var(--accent-strong));
+      color: #ffffff;
+      font-size: 0.95rem;
+      font-weight: 600;
+      box-shadow: 0 15px 35px rgba(31, 64, 207, 0.35);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .btn-primary span {
+      font-size: 1rem;
+    }
+
+    .hero-meta {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+    }
+
+    .hero-meta strong {
+      color: #2b3142;
+      font-weight: 600;
+    }
+
+    .hero-panel {
+      background: radial-gradient(circle at top left, #ffffff 0, #f3f4ff 40%, #dde4ff 100%);
+      border-radius: 26px;
+      box-shadow: var(--shadow-soft);
+      padding: 1.75rem 1.7rem 1.5rem;
+      border: 1px solid rgba(196, 204, 255, 0.8);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.1rem;
+    }
+
+    .pill {
+      padding: 0.2rem 0.6rem;
+      border-radius: 999px;
+      background: rgba(18, 19, 26, 0.06);
+      font-size: 0.72rem;
+      color: #272b38;
+    }
+
+    .hero-panel-title {
+      font-size: 0.95rem;
+      font-weight: 600;
+      margin-bottom: 0.1rem;
+    }
+
+    .hero-panel-sub {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .hero-panel-metrics {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 0.9rem;
+      margin-bottom: 1.1rem;
+      font-size: 0.78rem;
+    }
+
+    .metric {
+      background: rgba(255, 255, 255, 0.8);
+      border-radius: 12px;
+      padding: 0.55rem 0.6rem;
+      border: 1px solid rgba(214, 219, 245, 0.9);
+    }
+
+    .metric-label {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      margin-bottom: 0.15rem;
+    }
+
+    .metric-value {
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+
+    .hero-panel-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .hero-panel-badges {
+      display: flex;
+      gap: 0.35rem;
+      flex-wrap: wrap;
+    }
+
+    .badge-soft {
+      padding: 0.15rem 0.55rem;
+      border-radius: 999px;
+      font-size: 0.7rem;
+      background: rgba(75, 107, 255, 0.12);
+      color: var(--accent-strong);
+    }
+
+    .hero-panel-orb {
+      position: absolute;
+      right: -40px;
+      bottom: -40px;
+      width: 150px;
+      height: 150px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 20%, #ffffff 0, #7f5dff 40%, #4b6bff 80%);
+      opacity: 0.35;
+      filter: blur(0.5px);
+    }
+
+    .section-header {
+      max-width: 720px;
+      margin-bottom: 1.8rem;
+    }
+
+    .section-kicker {
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      color: var(--text-muted);
+      margin-bottom: 0.4rem;
+    }
+
+    .section-title {
+      font-size: 1.45rem;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.4rem;
+    }
+
+    .section-subtitle {
+      color: var(--text-muted);
+      font-size: 0.93rem;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1.4rem;
+    }
+
+    .card {
+      background: var(--bg-card);
+      border-radius: var(--radius-lg);
+      padding: 1.2rem 1.2rem 1.1rem;
+      border: 1px solid var(--border-subtle);
+      box-shadow: 0 10px 30px rgba(12, 21, 64, 0.03);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at top left, rgba(75, 107, 255, 0.12), transparent 55%);
+      opacity: 0;
+      transition: opacity 0.2s ease-out;
+      pointer-events: none;
+    }
+
+    .card:hover::before {
+      opacity: 1;
+    }
+
+    .card h3 {
+      font-size: 1.02rem;
+      margin-bottom: 0.4rem;
+    }
+
+    .card p {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+
+    .card ul {
+      margin-top: 0.45rem;
+      padding-left: 1.1rem;
+      font-size: 0.88rem;
+      color: var(--text-muted);
+    }
+
+    .card li + li {
+      margin-top: 0.25rem;
+    }
+
+    .tag-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      margin-top: 0.55rem;
+    }
+
+    .tag {
+      font-size: 0.7rem;
+      padding: 0.15rem 0.45rem;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: var(--accent-strong);
+    }
+
+    .card-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: var(--text-muted);
+      margin-bottom: 0.18rem;
+    }
+
+    .code-block {
+      font-family: "SF Mono", ui-monospace, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size: 0.78rem;
+      background: #0b1020;
+      color: #e4e8ff;
+      border-radius: var(--radius-md);
+      padding: 0.85rem 0.9rem;
+      margin-top: 0.6rem;
+      overflow-x: auto;
+      border: 1px solid #222741;
+    }
+
+    .code-block span.keyword {
+      color: #7dd3fc;
+    }
+    .code-block span.string {
+      color: #f9a8d4;
+    }
+    .code-block span.comment {
+      color: #64748b;
+    }
+    .code-block span.func {
+      color: #a5b4fc;
+    }
+
+    .pill-inline {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+      padding: 0.14rem 0.5rem;
+      border-radius: 999px;
+      background: rgba(22, 163, 74, 0.13);
+      color: #166534;
+      font-size: 0.72rem;
+      margin-left: 0.3rem;
+    }
+
+    .contact-card {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+
+    .contact-card a {
+      color: var(--accent-strong);
+      font-weight: 500;
+    }
+
+    footer {
+      padding: 1.4rem 1.5rem 2.2rem;
+      border-top: 1px solid rgba(210, 214, 233, 0.7);
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      background: rgba(248, 249, 255, 0.9);
+    }
+
+    .footer-inner {
+      max-width: 1160px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.8rem;
+      align-items: center;
+    }
+
+    @media (max-width: 880px) {
+      .hero {
+        grid-template-columns: minmax(0, 1fr);
+      }
+      .hero-panel {
+        order: -1;
+      }
+    }
+
+    @media (max-width: 720px) {
+      .nav {
+        padding-inline: 1rem;
+      }
+      .nav-links {
+        display: none;
+      }
+      .section {
+        padding-inline: 1rem;
+      }
+      .hero-panel-metrics {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="page">
+  <header>
+    <div class="nav">
+      <div class="logo">
+        <div class="logo-mark">M</div>
+        <span>Magentic</span>
+      </div>
+      <nav class="nav-links">
+        <a href="#solution">Solution</a>
+        <a href="#gcp">Google Cloud</a>
+        <a href="#architecture">Architecture</a>
+        <a href="#contact">Contact</a>
+      </nav>
+      <button class="nav-cta" onclick="location.href='mailto:omar@magentic.work'">
+        Contact sales
+        <span>↗</span>
+      </button>
+    </div>
+  </header>
+
+  <main>
+    <!-- Hero -->
+    <section class="section hero" id="top">
+      <div>
+        <div class="hero-label">
+          <div class="hero-label-dot"></div>
+          AI debugging for the software world
+        </div>
+        <h1 class="hero-title">
+          Fix browser bugs <span>10× faster</span> with AI-ready context.
+        </h1>
+        <p class="hero-subtitle">
+          FlowLens by Magentic is an AI agents lab product that records complete browser flows—screen, logs,
+          network, storage, and user actions—and delivers them to MCP-compatible coding agents on Google Cloud,
+          so they can debug autonomously with full context.
+        </p>
+        <div class="hero-badges">
+          <div class="badge">No-code MLOps for vision & debugging</div>
+          <div class="badge">Built on Google Cloud</div>
+          <div class="badge">MCP integration for AI agents</div>
+          <div class="badge">Privacy-first, encrypted by default</div>
+        </div>
+        <div class="hero-cta-row">
+          <button class="btn-primary" onclick="location.href='mailto:omar@magentic.work'">
+            Request early access
+            <span>✉️</span>
+          </button>
+          <span class="hero-meta">
+            <strong>2+ years</strong> building multi-agent systems for real software teams.
+          </span>
+        </div>
+        <div class="hero-meta">
+          Works with agents like Claude Code, Cursor, GitHub Copilot, Windsurf and other MCP-compatible tools.
+        </div>
+      </div>
+
+      <aside class="hero-panel" aria-label="Debugging session preview">
+        <div class="hero-panel-header">
+          <div>
+            <div class="hero-panel-title">Record · Debug · Fix</div>
+            <div class="hero-panel-sub">One link that your AI agent and your team both understand.</div>
+          </div>
+          <div class="pill">Live session · PII-safe</div>
+        </div>
+        <div class="hero-panel-metrics">
+          <div class="metric">
+            <div class="metric-label">Recording</div>
+            <div class="metric-value">00:31 · checkout-flow.mp4</div>
+          </div>
+          <div class="metric">
+            <div class="metric-label">Captured</div>
+            <div class="metric-value">logs · network · DOM</div>
+          </div>
+          <div class="metric">
+            <div class="metric-label">Sent to</div>
+            <div class="metric-value">Vertex AI agent</div>
+          </div>
+        </div>
+        <div class="code-block">
+          <span class="comment">// FlowLens MCP call on Google Cloud Run</span><br />
+          <span class="keyword">POST</span> <span class="string">/flows/&lt;session_id&gt;/context</span><br />
+          <span class="keyword">→</span> <span class="func">VertexAI</span>(<span class="string">"analyze_bug"</span>, {<br />
+          &nbsp;&nbsp;<span class="string">"network"</span>: <span class="string">"...HTTP 500 on /api/checkout"</span>,<br />
+          &nbsp;&nbsp;<span class="string">"console"</span>: <span class="string">"TypeError in PaymentService"</span>,<br />
+          &nbsp;&nbsp;<span class="string">"userFlow"</span>: <span class="string">"click › add_to_cart › pay"</span><br />
+          });<br />
+          <span class="comment">// Agent returns root cause + patch without copy-paste.</span>
+        </div>
+        <div class="hero-panel-footer">
+          <div class="hero-panel-badges">
+            <div class="badge-soft">Cloud Storage</div>
+            <div class="badge-soft">BigQuery</div>
+            <div class="badge-soft">Cloud Run · Vertex AI</div>
+          </div>
+          <span style="font-size:0.75rem;">Automatic PII redaction · AES-256 at rest</span>
+        </div>
+        <div class="hero-panel-orb"></div>
+      </aside>
+    </section>
+
+    <!-- Solution Overview -->
+    <section class="section" id="solution">
+      <div class="section-header">
+        <div class="section-kicker">Solution overview</div>
+        <h2 class="section-title">FlowLens – AI-powered debugging context for MCP agents</h2>
+        <p class="section-subtitle">
+          Magentic is an AI agents lab focused on building multi-agentic systems for the software world.
+          FlowLens gives your AI coding agents complete browser context so they can reproduce issues,
+          identify root causes, and propose fixes without manual log gathering or prompt engineering.
+        </p>
+      </div>
+      <div class="grid">
+        <article class="card">
+          <div class="card-label">Workflow</div>
+          <h3>Record · Share · Fix</h3>
+          <p>
+            Click record and reproduce the bug. FlowLens captures screen video, console output,
+            network traffic, user interactions, storage state, navigation events, and system
+            information automatically—no right-click inspect or manual screenshots.
+          </p>
+          <ul>
+            <li>1-minute setup via browser extension and FlowLens MCP server</li>
+            <li>One shareable link per bug for teammates and AI agents</li>
+            <li>SPA-friendly support for History API and hash-based routing</li>
+          </ul>
+          <div class="tag-row">
+            <span class="tag">Developer experience</span>
+            <span class="tag">Agentic workflows</span>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="card-label">AI agents</div>
+          <h3>Built for MCP-compatible tools</h3>
+          <p>
+            FlowLens packages raw browser data into structured, AI-ready context exposed through MCP.
+            Agents like Claude Code, Cursor, GitHub Copilot and Windsurf can query flows, inspect
+            logs, follow user actions, and suggest diffs or pull requests with full situational awareness.
+          </p>
+          <ul>
+            <li>MCP interface hosted on Google Cloud Run</li>
+            <li>Context streaming to Vertex AI and external IDE agents</li>
+            <li>Pre-built tools for log, network, and DOM interrogation</li>
+          </ul>
+          <div class="tag-row">
+            <span class="tag">Multi-agent systems</span>
+            <span class="tag">Autonomous debugging</span>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="card-label">Outcomes</div>
+          <h3>From bug reports to actionable fixes</h3>
+          <p>
+            Teams replace vague “it’s broken” tickets with rich, reproducible flows. AI agents work
+            against full context, reducing back-and-forth, shrinking context windows, and turning
+            noisy logs into concrete, testable fixes.
+          </p>
+          <ul>
+            <li>Faster triage and root-cause analysis</li>
+            <li>Less time spent gathering debugging evidence</li>
+            <li>Clearer collaboration between product, QA, and engineering</li>
+          </ul>
+          <div class="tag-row">
+            <span class="tag">Cycle-time reduction</span>
+            <span class="tag">Quality & reliability</span>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- Google Cloud Integration -->
+    <section class="section" id="gcp">
+      <div class="section-header">
+        <div class="section-kicker">Google Cloud</div>
+        <h2 class="section-title">How FlowLens runs on Google Cloud</h2>
+        <p class="section-subtitle">
+          FlowLens is designed to live natively on Google Cloud, using managed services for ingest,
+          storage, indexing, AI reasoning, and observability. This keeps the platform scalable,
+          secure, and simple to operate for both Magentic and customers.
+        </p>
+      </div>
+      <div class="grid">
+        <article class="card">
+          <h3>Data ingestion & storage</h3>
+          <p>
+            Browser recordings are streamed to Google Cloud via secure endpoints. Raw assets and
+            structured events are stored in <strong>Cloud Storage</strong>, with metadata and session
+            indexes maintained in <strong>BigQuery</strong> for fast retrieval and analytics.
+          </p>
+          <ul>
+            <li>Versioned, encrypted object storage for videos and traces</li>
+            <li>BigQuery schemas for sessions, requests, console events, and user actions</li>
+            <li>Support for retention policies per workspace</li>
+          </ul>
+          <div class="tag-row">
+            <span class="tag">Cloud Storage</span>
+            <span class="tag">BigQuery</span>
+          </div>
+        </article>
+
+        <article class="card">
+          <h3>AI reasoning & MCP interface</h3>
+          <p>
+            The FlowLens MCP API runs on <strong>Cloud Run</strong>, exposing REST and MCP endpoints
+            that orchestrate calls to <strong>Vertex AI</strong> models. Agents can request summaries,
+            root-cause hypotheses, reproduction steps, and patch suggestions generated from the
+            captured flow.
+          </p>
+          <ul>
+            <li>Stateless container workloads auto-scale on Cloud Run</li>
+            <li>Vertex AI prompts tuned for debugging tasks</li>
+            <li>Optional integration with IDE or CI agents through MCP</li>
+          </ul>
+          <div class="tag-row">
+            <span class="tag">Cloud Run</span>
+            <span class="tag">Vertex AI</span>
+          </div>
+        </article>
+
+        <article class="card">
+          <h3>Security, privacy & compliance</h3>
+          <p>
+            FlowLens is privacy-first. Sensitive fields are redacted locally before upload, and all
+            data in Google Cloud is encrypted with <strong>Cloud KMS</strong>–managed keys.
+            <strong>Cloud IAM</strong> enforces workspace-level access control, while
+            <strong>Cloud Logging</strong> and <strong>Cloud Monitoring</strong> provide full
+            observability and audit trails.
+          </p>
+          <ul>
+            <li>End-to-end TLS and AES-256 encryption at rest</li>
+            <li>Fine-grained IAM roles for tenants and agents</li>
+            <li>Logging and metrics for security, performance, and cost</li>
+          </ul>
+          <div class="tag-row">
+            <span class="tag">Cloud IAM</span>
+            <span class="tag">Cloud KMS</span>
+            <span class="tag">Cloud Logging & Monitoring</span>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- Architecture & Use Cases -->
+    <section class="section" id="architecture">
+      <div class="section-header">
+        <div class="section-kicker">Architecture & usage</div>
+        <h2 class="section-title">From browser session to AI-generated fix</h2>
+        <p class="section-subtitle">
+          FlowLens slots into existing development workflows with minimal friction. It acts as a
+          capture and context layer that feeds AI agents, not as yet another ticketing system.
+        </p>
+      </div>
+      <div class="grid">
+        <article class="card">
+          <h3>High-level architecture</h3>
+          <p>
+            The recording extension and MCP server collect session data and send it to Google Cloud.
+            A lightweight ingest service persists events and media into Cloud Storage and BigQuery.
+            MCP endpoints on Cloud Run fetch context and orchestrate Vertex AI calls for analysis.
+          </p>
+          <ul>
+            <li>Client: FlowLens extension + local MCP server</li>
+            <li>Backend: Cloud Run APIs, Cloud Functions for async tasks</li>
+            <li>Data: Cloud Storage, BigQuery, Logging, Monitoring</li>
+          </ul>
+          <div class="tag-row">
+            <span class="tag">Scalable by design</span>
+            <span class="tag">Serverless</span>
+          </div>
+        </article>
+
+        <article class="card">
+          <h3>Typical debugging flow</h3>
+          <p>
+            A developer records a failing user journey and shares the FlowLens link. An AI coding
+            agent pulls the associated context via MCP on Cloud Run, analyzes network, console and
+            DOM state with Vertex AI, and proposes code changes or test cases back to the team.
+          </p>
+          <ul>
+            <li>Better bug reports for distributed teams</li>
+            <li>Fewer context-switches between tools</li>
+            <li>Grounded AI suggestions tied to real sessions</li>
+          </ul>
+          <div class="tag-row">
+            <span class="tag">Remote teams</span>
+            <span class="tag">QA & SRE collaboration</span>
+          </div>
+        </article>
+
+        <article class="card">
+          <h3>Who we serve</h3>
+          <p>
+            FlowLens targets software startups, small businesses, and mid-market engineering
+            organizations that rely on web applications and want to adopt AI agents without losing
+            control over data and compliance on Google Cloud.
+          </p>
+          <ul>
+            <li>Modern product engineering and platform teams</li>
+            <li>Developer tools and internal developer platform groups</li>
+            <li>Teams standardizing on Google Cloud for AI workloads</li>
+          </ul>
+          <div class="tag-row">
+            <span class="tag">Software & internet</span>
+            <span class="tag">Developer tools</span>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- Contact -->
+    <section class="section" id="contact">
+      <div class="section-header">
+        <div class="section-kicker">Contact</div>
+        <h2 class="section-title">Work with the Magentic team</h2>
+        <p class="section-subtitle">
+          We are actively partnering with engineering teams that want to bring AI agents into their
+          debugging workflows while keeping everything grounded in real browser context on Google Cloud.
+        </p>
+      </div>
+      <div class="grid">
+        <article class="card contact-card">
+          <h3>Get in touch</h3>
+          <p>
+            Email us at
+            <a href="mailto:omar@magentic.work">omar@magentic.work</a>
+            to discuss pilots, Google Cloud integration, or tailored debugging workflows for your
+            organization.
+          </p>
+          <p>
+            Company: <strong>Magentic</strong><br />
+            Website:
+            <a href="https://magentic.work" target="_blank" rel="noopener noreferrer">
+              magentic.work
+            </a>
+          </p>
+          <p>
+            <span class="pill-inline">
+              Built for Google Cloud teams
+            </span>
+          </p>
+        </article>
+        <article class="card">
+          <h3>Deploy this page on GitHub Pages</h3>
+          <ol style="margin-top:0.5rem; padding-left:1.1rem; font-size:0.86rem; color:var(--text-muted);">
+            <li>Create a new public repository named <strong>magentic.github.io</strong> (or any name).</li>
+            <li>Add a file named <strong>index.html</strong> with this code and commit it.</li>
+            <li>In repository settings, enable <strong>GitHub Pages</strong> with the main branch.</li>
+            <li>Your site will be live at the URL shown in the Pages settings.</li>
+          </ol>
+          <div class="tag-row">
+            <span class="tag">Static HTML</span>
+            <span class="tag">No build step</span>
+          </div>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+      <span>© <span id="year"></span> Magentic. All rights reserved.</span>
+      <span>AI agents lab for debugging and multi-agent systems on Google Cloud.</span>
+    </div>
+  </footer>
+</div>
+
+<script>
+  // simple year updater
+  document.getElementById("year").textContent = new Date().getFullYear();
+</script>
+</body>
+</html>
